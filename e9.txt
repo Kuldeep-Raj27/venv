@@ -1,0 +1,66 @@
+# Experi - 9: To write a program to simulate a two-link robotic arm 
+# for tracing a square path using trajectory planning.
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+# 1. Robot Parameters
+l1, l2 = 2.0, 2.0
+
+def solve_ik(x, y):
+    # Inverse Kinematics to find angles for any (x,y) point
+    d_sq = x**2 + y**2
+    cos_t2 = (d_sq - l1**2 - l2**2) / (2 * l1 * l2)
+    cos_t2 = np.clip(cos_t2, -1.0, 1.0)
+    
+    t2 = np.arccos(cos_t2)
+    t1 = np.atan2(y, x) - np.atan2(l2 * np.sin(t2), l1 + l2 * np.cos(t2))
+    return t1, t2
+
+# 2. Trajectory Planning (Square Path)
+# Define the 4 corners of the square (x, y)
+corners = [(1, 1), (2, 1), (2, 2), (1, 2), (1, 1)]
+path_x = []
+path_y = []
+
+# Generate 10 points between each corner for a smooth trajectory
+for i in range(len(corners) - 1):
+    start, end = corners[i], corners[i+1]
+    path_x.extend(np.linspace(start[0], end[0], 10))
+    path_y.extend(np.linspace(start[1], end[1], 10))
+
+# 3. Visualization - Two Separate Images
+
+# Image 1: Robot posture at each corner
+plt.figure(1)
+for i in [0, 10, 20, 30]: # Indices for the 4 corners
+    t1, t2 = solve_ik(path_x[i], path_y[i])
+    # Forward Kinematics for plotting
+    x1, y1 = l1 * np.cos(t1), l1 * np.sin(t1)
+    x2, y2 = x1 + l2 * np.cos(t1 + t2), y1 + l2 * np.sin(t1 + t2)
+    plt.plot([0, x1, x2], [0, y1, y2], '-o', label=f"Corner {i//10 + 1}")
+
+plt.title("Robot Poses at Square Corners")
+plt.grid(True)
+plt.axis([-1, 4, -1, 4])
+plt.legend()
+
+# Image 2: The final traced square path
+plt.figure(2)
+actual_x, actual_y = [], []
+for i in range(len(path_x)):
+    t1, t2 = solve_ik(path_x[i], path_y[i])
+    # Verify the position of the end-effector
+    ex = l1 * np.cos(t1) + l2 * np.cos(t1 + t2)
+    ey = l1 * np.sin(t1) + l2 * np.sin(t1 + t2)
+    actual_x.append(ex)
+    actual_y.append(ey)
+
+plt.plot(path_x, path_y, 'r--', label="Planned Trajectory")
+plt.plot(actual_x, actual_y, 'b-', linewidth=2, label="Actual Trace")
+plt.title("Square Path Trajectory Result")
+plt.grid(True)
+plt.axis([0, 3, 0, 3])
+plt.legend()
+
+plt.show()

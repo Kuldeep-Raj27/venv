@@ -1,0 +1,52 @@
+# Experi - 4: To write a program to perform rotation of three connected links 
+# as a kinematic chain about a specified reference point.
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+# 1. Define coordinates of the chain joints
+# Point 0 (Base), Point 1, Point 2, Point 3 (End Effector)
+x = [2, 4, 4, 5]
+y = [2, 2, 3.5, 3.5]
+
+# 2. Rotation Parameters
+xr, yr = 2, 2      # Specified Reference Point (Pivot at the base)
+angle_deg = 60     # Rotation angle in degrees
+theta = np.radians(angle_deg)
+
+# 3. Calculation using for-loop (Human-friendly way)
+x_rot = []
+y_rot = []
+
+for i in range(len(x)):
+    # Step A: Shift point so pivot is at (0,0)
+    x_shift = x[i] - xr
+    y_shift = y[i] - yr
+    
+    # Step B: Apply rotation formula
+    x_new = x_shift * np.cos(theta) - y_shift * np.sin(theta)
+    y_new = x_shift * np.sin(theta) + y_shift * np.cos(theta)
+    
+    # Step C: Shift back to original reference point
+    x_rot.append(x_new + xr)
+    y_rot.append(y_new + yr)
+
+# 4. Visualization - Two separate images
+
+# Image 1: Original Pose
+plt.figure(1)
+plt.plot(x, y, 'b-o', linewidth=3, markersize=8) 
+plt.plot(xr, yr, 'ro') # Mark the pivot point
+plt.title("Original 3-Link Chain")
+plt.grid(True)
+plt.axis([0, 8, 0, 8])
+
+# Image 2: Rotated Pose
+plt.figure(2)
+plt.plot(x_rot, y_rot, 'g-o', linewidth=3, markersize=8)
+plt.plot(xr, yr, 'ro') # Pivot remains fixed
+plt.title(f"3-Link Chain Rotated {angle_deg} Degrees")
+plt.grid(True)
+plt.axis([0, 8, 0, 8])
+
+plt.show()

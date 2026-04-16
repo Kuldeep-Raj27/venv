@@ -1,0 +1,53 @@
+# Experiment 3: To write a program to perform relative rotation 
+# of a hut about a specified pivot point.
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+# 1. Define the Hut coordinates (Square + Triangle roof)
+# Coordinates: (1,1), (2,1), (2,2), (1,2), (1,1) -> Base
+# (1,2), (1.5, 2.5), (2,2) -> Roof
+x = [1, 2, 2, 1, 1, 1.5, 2]
+y = [1, 1, 2, 2, 1, 2.5, 2]
+
+# 2. Input Pivot Point and Angle
+px, py = 1.5, 1.5  # Specified Pivot Point (e.g., Center of the hut)
+angle = 30         # Rotation angle in degrees
+theta = np.radians(angle)
+
+# 3. Calculation using basic trigonometry
+x_new = []
+y_new = []
+
+for i in range(len(x)):
+    # Step 1: Translate point relative to pivot
+    x_temp = x[i] - px
+    y_temp = y[i] - py
+    
+    # Step 2: Rotate using standard formula
+    x_rot = x_temp * np.cos(theta) - y_temp * np.sin(theta)
+    y_rot = x_temp * np.sin(theta) + y_temp * np.cos(theta)
+    
+    # Step 3: Translate back
+    x_new.append(x_rot + px)
+    y_new.append(y_rot + py)
+
+# 4. Plotting - Image 1: Before Rotation
+plt.figure(1)
+plt.plot(x, y, 'b-o', label="Original")
+plt.plot(px, py, 'rx', markersize=10, label="Pivot") # Mark the pivot point
+plt.title("Hut Before Relative Rotation")
+plt.grid(True)
+plt.axis([0, 4, 0, 4])
+plt.legend()
+
+# 5. Plotting - Image 2: After Rotation
+plt.figure(2)
+plt.plot(x_new, y_new, 'g-o', label="Rotated")
+plt.plot(px, py, 'rx', markersize=10, label="Pivot") # Pivot stays in same spot
+plt.title(f"Hut After {angle} Degree Relative Rotation")
+plt.grid(True)
+plt.axis([0, 4, 0, 4])
+plt.legend()
+
+plt.show()
